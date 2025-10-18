@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Hero.module.css';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { Link } from 'react-router-dom'; // ✅ add this import
 
 //hero banner images
 import pic1 from '../../assets/photos/photo1.jpg';
@@ -67,12 +68,17 @@ const Hero: React.FC = () => {
           <h1 className={styles.head}>GREENBAY PHARMACEUTICALS</h1>
           <h1>Your Trusted Online Pharmacy</h1>
           <p>Affordable medicines, quality healthcare, and expert support—anytime, anywhere.</p>
-          <div className={styles.buttons}>
-            <a href="products/prescription" className={styles.primaryBtn}>Shop Now</a>
-            <a href="/contact-us" className={styles.secondaryBtn}>Contact Us</a>
-          </div>
+              <div className={styles.buttons}>
+                <Link to="/products/prescription" className={styles.primaryBtn}>
+                  Shop Now
+                </Link>
+                <Link to="/contact-us" className={styles.secondaryBtn}>
+                  Contact Us
+                </Link>
+              </div>
         </div>
-      </div>
+      </div>         
+
     </section>
   );
 };
