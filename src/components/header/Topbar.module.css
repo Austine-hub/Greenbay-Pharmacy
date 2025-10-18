@@ -1,0 +1,165 @@
+/* ===========================================================
+   TOPBAR MODULE CSS — Modern Medical/Pharmacy UI
+   Optimized for Clarity, Trust & Accessibility
+   =========================================================== */
+
+:root {
+  --color-bg-topbar: #062b36; /* deep medical teal */
+  --color-text: #ffffff;
+  --color-accent: #00b894; /* pharmacy green-teal */
+  --color-accent-hover: #009f80;
+  --color-hover: #7a0c2e;
+  --container-max: 1200px;
+  --transition-speed: 0.3s;
+  --font-main: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+/* === Structure === */
+.topbar {
+  width: 100%;
+  background-color: var(--color-bg-topbar);
+  color: var(--color-text);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.6rem 0;
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  transition: all var(--transition-speed) ease;
+}
+
+/* === Brand === */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.logoIcon {
+  font-size: 1.1rem;
+  color: var(--color-accent);
+}
+
+/* === Tagline === */
+.tagline {
+  flex: 1;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-align: center;
+  color: wheat;
+  opacity: 0.9;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* === Actions === */
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.callBtn,
+.whatsappBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--color-text);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background-color: whitesmoke;
+  transition: all var(--transition-speed) ease;
+}
+
+.icon {
+  font-size: 0.9rem;
+}
+
+/* === Hover States === */
+.callBtn:hover {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.whatsappBtn {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.whatsappBtn:hover {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+/* === Responsive Design === */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 1.5rem;
+  }
+
+  .tagline {
+    font-size: 0.85rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.6rem;
+    padding: 0 1rem;
+  }
+
+  .tagline {
+    white-space: normal;
+    font-size: 0.85rem;
+  }
+
+  .brand {
+    font-size: 0.95rem;
+  }
+
+  .actions {
+    justify-content: center;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .topbar {
+    padding: 0.5rem 0;
+  }
+
+  .callBtn,
+  .whatsappBtn {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.9rem;
+  }
+
+  .container {
+    padding: 0 0.75rem;
+  }
+}
