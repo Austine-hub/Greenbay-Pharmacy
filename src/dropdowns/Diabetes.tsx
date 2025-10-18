@@ -11,7 +11,7 @@ import sitagliptinImg from "../assets/diabetes/Sitagliptin.png";
 import vildagliptinImg from "../assets/diabetes/Vildagliptin.png";
 import empagliflozinImg from "../assets/diabetes/Empagliflozin.png";
 import dapagliflozinImg from "../assets/diabetes/Dapagliflozin.png";
-import insulinGlargineImg from "../assets/diabetes/InsulinGlargine.png";
+import insulinGlargineImg from "../assets/diabetes/Insulinglargine.png";
 import insulinAspartImg from "../assets/diabetes/InsulinAspart.png";
 import insulinDetemirImg from "../assets/diabetes/InsulinDetemir.png";
 import pioglitazoneImg from "../assets/diabetes/Pioglitazone.png";
