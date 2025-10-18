@@ -206,3 +206,20 @@ p {
     padding: 1rem 0;
   }
 }
+
+
+:root[data-theme='light'] {
+  --color-bg: #ffffff;
+  --color-text: #111827;
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #111827;
+  --color-text: #f3f4f6;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: background 0.3s ease, color 0.3s ease;
+}

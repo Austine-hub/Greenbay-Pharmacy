@@ -2,8 +2,8 @@
 // CONTACT US — Accessible, Scalable, Responsive (2025)
 // ===============================================================
 
-import React, { useState, useRef, ChangeEvent } from "react";
-import type { FormEvent } from "react"; // ✅ Fix for TS1484
+import React, { useState, useRef } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import styles from "./ContactUs.module.css";
 
 // Hero & team images (replace with your assets)
@@ -43,7 +43,7 @@ const initialState: ContactPayload = {
 // ===============================================================
 
 const ContactUs: React.FC<Props> = ({ onSubmit }) => {
-  const [form, setForm] = useState(initialState);
+  const [form, setForm] = useState<ContactPayload>(initialState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const successRef = useRef<HTMLDivElement | null>(null);
@@ -53,15 +53,27 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
   // ===============================================================
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!form.name.trim()) e.name = "Full name is required.";
-    if (!form.email.trim()) e.email = "Email is required.";
-    else if (
-      !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(form.email.trim())
-    )
+
+    if (!(form.name ?? "").trim()) e.name = "Full name is required.";
+
+    if (!(form.email ?? "").trim()) {
+      e.email = "Email is required.";
+    } else if (
+      !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+        (form.email ?? "").trim()
+      )
+    ) {
       e.email = "Enter a valid email address.";
-    if (!form.message.trim()) e.message = "Please enter a message.";
-    if (form.phone.trim() && !/^[0-9+\s()-]{6,20}$/.test(form.phone.trim()))
+    }
+
+    if (!(form.message ?? "").trim()) e.message = "Please enter a message.";
+
+    // Safely handle optional phone using nullish coalescing
+    const phoneTrimmed = (form.phone ?? "").trim();
+    if (phoneTrimmed && !/^[0-9+\s()-]{6,20}$/.test(phoneTrimmed)) {
       e.phone = "Enter a valid phone number.";
+    }
+
     return e;
   };
 
@@ -71,41 +83,48 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
   const handleChange =
     (key: keyof ContactPayload) =>
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setForm((s) => ({ ...s, [key]: e.target.value }));
+      const value = e.target.value;
+      setForm((s) => ({ ...s, [key]: value }));
       setErrors((prev) => ({ ...prev, [key]: "" }));
     };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const validation = validate();
     setErrors(validation);
 
     if (Object.keys(validation).length > 0) {
       const firstKey = Object.keys(validation)[0];
-      document.querySelector<HTMLInputElement | HTMLTextAreaElement>(
-        `#contact-${firstKey}`
-      )?.focus();
+      document
+        .querySelector<HTMLInputElement | HTMLTextAreaElement>(
+          `#contact-${firstKey}`
+        )
+        ?.focus();
       return;
     }
 
     setSubmitting(true);
-    const payload = {
-      name: form.name.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim() || undefined,
-      subject: form.subject.trim() || undefined,
-      message: form.message.trim(),
+
+    const payload: ContactPayload = {
+      name: (form.name ?? "").trim(),
+      email: (form.email ?? "").trim(),
+      phone: (form.phone ?? "").trim() || undefined,
+      subject: (form.subject ?? "").trim() || undefined,
+      message: (form.message ?? "").trim(),
     };
 
     try {
       if (onSubmit) {
         await onSubmit(payload);
       } else {
-        console.log("Contact form payload:", payload); // replace with real API call
+        // Replace with a real API call as needed
+        console.log("Contact form payload:", payload);
       }
 
       setForm(initialState);
       setErrors({});
+      // move focus to success region for screen readers
       successRef.current?.focus();
     } catch (err) {
       console.error("Contact submit error:", err);
@@ -122,10 +141,7 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
   // RENDER
   // ===============================================================
   return (
-    <section
-      className={styles.contactSection}
-      aria-labelledby="contact-heading"
-    >
+    <section className={styles.contactSection} aria-labelledby="contact-heading">
       <div className={styles.container}>
         <header className={styles.header}>
           <h2 id="contact-heading" className={styles.title}>
@@ -196,9 +212,7 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
                   role="img"
                   aria-label="Map placeholder"
                 >
-                  <div className={styles.mapInner}>
-                    Map placeholder — embed your map here
-                  </div>
+                  <div className={styles.mapInner}>Map placeholder — embed your map here</div>
                 </div>
 
                 <div className={styles.teamCard}>
@@ -239,11 +253,7 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
                   required: true,
                 },
                 { id: "phone", label: "Phone (optional)", type: "tel" },
-                {
-                  id: "subject",
-                  label: "Subject (optional)",
-                  type: "text",
-                },
+                { id: "subject", label: "Subject (optional)", type: "text" },
               ].map(({ id, label, type, required }) => (
                 <div className={styles.row} key={id}>
                   <label htmlFor={`contact-${id}`} className={styles.label}>
@@ -253,10 +263,8 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
                     id={`contact-${id}`}
                     name={id}
                     type={type}
-                    className={`${styles.input} ${
-                      errors[id] ? styles.invalid : ""
-                    }`}
-                    value={form[id as keyof ContactPayload] || ""}
+                    className={`${styles.input} ${errors[id] ? styles.invalid : ""}`}
+                    value={(form[id as keyof ContactPayload] as string) ?? ""}
                     onChange={handleChange(id as keyof ContactPayload)}
                     placeholder={
                       id === "email"
@@ -266,15 +274,12 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
                         : undefined
                     }
                     required={required}
+                    aria-required={required}
                     aria-invalid={!!errors[id]}
                     aria-describedby={errors[id] ? `error-${id}` : undefined}
                   />
                   {errors[id] && (
-                    <div
-                      role="alert"
-                      id={`error-${id}`}
-                      className={styles.error}
-                    >
+                    <div role="alert" id={`error-${id}`} className={styles.error}>
                       {errors[id]}
                     </div>
                   )}
@@ -290,24 +295,17 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
                   id="contact-message"
                   name="message"
                   rows={6}
-                  className={`${styles.textarea} ${
-                    errors.message ? styles.invalid : ""
-                  }`}
-                  value={form.message}
+                  className={`${styles.textarea} ${errors.message ? styles.invalid : ""}`}
+                  value={form.message ?? ""}
                   onChange={handleChange("message")}
                   placeholder="Tell us how we can help..."
                   required
+                  aria-required
                   aria-invalid={!!errors.message}
-                  aria-describedby={
-                    errors.message ? "error-message" : undefined
-                  }
+                  aria-describedby={errors.message ? "error-message" : undefined}
                 />
                 {errors.message && (
-                  <div
-                    role="alert"
-                    id="error-message"
-                    className={styles.error}
-                  >
+                  <div role="alert" id="error-message" className={styles.error}>
                     {errors.message}
                   </div>
                 )}
@@ -350,7 +348,7 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
             </form>
 
             {/* Quick Contact Links */}
-            <aside className={styles.quickLinks}>
+            <aside className={styles.quickLinks} aria-label="Quick contact">
               <h4 className={styles.smallTitle}>Quick contact</h4>
               <ul className={styles.quickList}>
                 <li>
@@ -361,10 +359,7 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
                 </li>
                 <li>
                   <strong>Pharmacy orders</strong>{" "}
-                  <a
-                    href="mailto:orders@yourpharmacy.co.ke"
-                    className={styles.link}
-                  >
+                  <a href="mailto:orders@yourpharmacy.co.ke" className={styles.link}>
                     orders@yourpharmacy.co.ke
                   </a>
                 </li>
@@ -373,7 +368,7 @@ const ContactUs: React.FC<Props> = ({ onSubmit }) => {
                   <a
                     href="https://wa.me/254700000002"
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noreferrer noopener"
                     className={styles.link}
                   >
                     Chat on WhatsApp

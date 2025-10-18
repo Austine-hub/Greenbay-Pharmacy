@@ -52,9 +52,7 @@ const ScrollToTop: React.FC = () => {
    APP ROOT COMPONENT — MODERNIZED STRUCTURE
    ========================================================== */
 const App: React.FC = () => {
-  const location = useLocation();
-  const isHome = location.pathname === "/";
-
+ 
   return (
     <>
       {/* === Persistent Global Elements === */}

@@ -2,7 +2,8 @@
 // THEME PROVIDER — Modern, Accessible, Extendable (2025)
 // ===============================================================
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import type { ReactNode } from "react"; // ✅ Type-only import (fixes TS1484)
 
 // ===============================================================
 // ✅ Type Definitions
@@ -19,7 +20,7 @@ interface ThemeProviderProps {
 }
 
 // ===============================================================
-// ✅ Create Context
+// ✅ Context Creation
 // ===============================================================
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
@@ -29,30 +30,35 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>("light");
 
-  // Detect system preference & listen for changes
+  // Detect system theme preference and listen for OS-level changes
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    const applyTheme = (isDark: boolean) => {
-      setTheme(isDark ? "dark" : "light");
+    const updateTheme = (isDark: boolean) => {
+      const newTheme: Theme = isDark ? "dark" : "light";
+      setTheme(newTheme);
+      document.documentElement.setAttribute("data-theme", newTheme);
     };
 
-    applyTheme(mediaQuery.matches);
+    // Apply current system theme
+    updateTheme(mediaQuery.matches);
 
-    const handleChange = (e: MediaQueryListEvent) => applyTheme(e.matches);
+    // Watch for system changes dynamically
+    const handleChange = (event: MediaQueryListEvent) => updateTheme(event.matches);
     mediaQuery.addEventListener("change", handleChange);
 
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
   }, []);
 
-  // Apply current theme to <html>
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  // Theme toggle for user control
+  // Toggle manually between light and dark themes
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+    setTheme((prev) => {
+      const newTheme = prev === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      return newTheme;
+    });
   };
 
   return (
@@ -63,7 +69,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 };
 
 // ===============================================================
-// ✅ Hook for Easy Access
+// ✅ Custom Hook for Easy Usage
 // ===============================================================
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
