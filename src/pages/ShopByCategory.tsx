@@ -1,8 +1,15 @@
-import React, { useRef, useState } from "react";
+// ============================================================
+// File: ShopByCategory.tsx — 2025 Production-Ready Edition
+// ============================================================
+
+import React, { useRef, useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { toast } from "react-hot-toast";
 import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import styles from "./ShopByCategory.module.css";
 
-// === ASSET IMPORTS ===
+// === CATEGORY IMAGES ===
 import pic1 from "../assets/shop1/cough.png";
 import pic2 from "../assets/shop1/accessories.png";
 import pic3 from "../assets/shop1/Vitamins.png";
@@ -42,37 +49,52 @@ const categories: Category[] = [
   { id: "uti", title: "UTI", image: pic12 },
 ];
 
-// === COMPONENT ===
+// ============================================================
+// Component
+// ============================================================
 const ShopByCategory: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  // Scroll handler
   const handleScroll = (direction: "left" | "right") => {
     const container = scrollRef.current;
     if (!container) return;
-
-    const scrollWidth = container.clientWidth;
-    const scrollAmount = direction === "left" ? -scrollWidth * 0.8 : scrollWidth * 0.8;
-
+    const scrollAmount = direction === "left" ? -container.clientWidth * 0.8 : container.clientWidth * 0.8;
     container.scrollBy({ left: scrollAmount, behavior: "smooth" });
   };
 
+  // Quick View handler
   const handleImageClick = (image: string) => {
-    // Open modal only for large screens
-    if (window.innerWidth >= 1024) {
-      setSelectedImage(image);
-    }
+    setSelectedImage(image);
+    toast.success("Quick view opened!");
   };
 
   const closeModal = () => setSelectedImage(null);
 
+  // Keyboard close support (ESC key)
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeModal();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
+  const { ref: sectionRef, inView } = useInView({ triggerOnce: true, threshold: 0.2 });
+
   return (
-    <section className={styles.section} aria-labelledby="shop-category-title">
-      <div className={styles.header}>
+    <section ref={sectionRef} className={styles.section} aria-labelledby="shop-category-title">
+      <motion.div
+        className={styles.header}
+        initial={{ opacity: 0, y: 20 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5 }}
+      >
         <h2 id="shop-category-title" className={styles.title}>
           Shop by Category
         </h2>
-      </div>
+      </motion.div>
 
       <div className={styles.carouselWrapper}>
         <button
@@ -84,24 +106,27 @@ const ShopByCategory: React.FC = () => {
         </button>
 
         <div ref={scrollRef} className={styles.carousel}>
-          {categories.map((cat) => (
-            <article key={cat.id} className={styles.card}>
+          {categories.map((cat, index) => (
+            <motion.article
+              key={cat.id}
+              className={styles.card}
+              initial={{ opacity: 0, y: 30 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: index * 0.05, duration: 0.4 }}
+            >
               <div className={styles.imageWrapper}>
-                <img
-                  src={cat.image}
-                  alt={cat.title}
-                  className={styles.image}
-                  loading="lazy"
-                />
-                <button
+                <img src={cat.image} alt={cat.title} className={styles.image} loading="lazy" />
+                <motion.button
                   className={styles.quickViewBtn}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => handleImageClick(cat.image)}
                 >
                   Quick View
-                </button>
+                </motion.button>
               </div>
               <h3 className={styles.cardTitle}>{cat.title}</h3>
-            </article>
+            </motion.article>
           ))}
         </div>
 
@@ -114,20 +139,27 @@ const ShopByCategory: React.FC = () => {
         </button>
       </div>
 
-      {/* === MODAL FOR QUICK VIEW === */}
+      {/* === MODAL === */}
       {selectedImage && (
-        <div className={styles.modalBackdrop} onClick={closeModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button
-              className={styles.closeBtn}
-              onClick={closeModal}
-              aria-label="Close preview"
-            >
+        <motion.div
+          className={styles.modalBackdrop}
+          onClick={closeModal}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <motion.div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.25 }}
+          >
+            <button className={styles.closeBtn} onClick={closeModal} aria-label="Close preview">
               <FaTimes />
             </button>
             <img src={selectedImage} alt="Quick View" className={styles.modalImage} />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
     </section>
   );

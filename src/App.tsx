@@ -1,4 +1,5 @@
-import { Suspense, lazy, useEffect, FC } from "react";
+import { Suspense, lazy, useEffect } from "react";
+import type { FC } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 
 import Topbar from "./components/header/Topbar";
